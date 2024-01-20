@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"net/http"
@@ -10,8 +11,42 @@ import (
 )
 
 func GetSheet(c *fiber.Ctx) error {
-	return c.Status(http.StatusOK).JSON(fiber.Map{"status": "success", "message": "Password data updated successfully"})
-	
+
+	// Get the form data from the request
+	hackathonType := c.FormValue("hackathon_type")
+
+	// Create a new HTTP client
+	client := &http.Client{}
+
+	// Prepare the form data
+	formData := map[string]string{
+		"hackathon_type": hackathonType,
+	}
+
+	// Encode the form data
+	values := make([]string, 0, len(formData))
+	for key, value := range formData {
+		values = append(values, fmt.Sprintf("%s=%s", key, value))
+	}
+	formBody := bytes.NewBufferString(strings.Join(values, "&"))
+
+	// Make the POST request to the external API
+	resp, err := client.Post("https://script.google.com/macros/s/AKfycbxbbQi2Ikmgi12doDxqN04zqV4k2uDRQZVqJ6GeYn03Qo5n2wKT-IWs2tSScvOjzRe2Wg/exec", "application/x-www-form-urlencoded", formBody)
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).SendString("Error making request")
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).SendString("Error reading response")
+	}
+
+	fmt.Println(string(body))
+
+	// Send a response if necessary
+	return c.SendString("Request completed successfully")
+
 }
 
 func weebhookcall() {
@@ -46,6 +81,6 @@ func weebhookcall() {
 	fmt.Println(string(body))
 }
 
-func errorhandling(c *fiber.Ctx) error {
-	return c.SendString("Hello, World 👋!")
-}
+// func errorhandling(c *fiber.Ctx) error {
+// 	return c.SendString("Hello, World 👋!")
+// }

@@ -2,6 +2,8 @@ module github.com/loopassembly/pentathon-backend
 
 go 1.21.4
 
+require github.com/gofiber/fiber/v2 v2.52.0
+
 require (
 	dario.cat/mergo v1.0.0 // indirect
 	github.com/andybalholm/brotli v1.0.5 // indirect
@@ -12,7 +14,6 @@ require (
 	github.com/creack/pty v1.1.18 // indirect
 	github.com/fatih/color v1.14.1 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
-	github.com/gofiber/fiber/v2 v2.52.0 // indirect
 	github.com/gohugoio/hugo v0.111.3 // indirect
 	github.com/google/uuid v1.5.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
