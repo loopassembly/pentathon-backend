@@ -4,7 +4,7 @@ package routes
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/loopassembly/pentathon-backend/controllers" // Replace with your actual import path
+	"github.com/loopassembly/pentathon-backend/controllers" 
 )
 
 func SetupRoutes(app *fiber.App) {

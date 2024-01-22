@@ -29,7 +29,7 @@ type SoloData struct {
 
 
 func SoloController(c *fiber.Ctx) error {
-	// Use c.Request().Body() directly, which returns a function that returns []byte
+	
 	bodyFn := c.Request().Body
 
 	var soloData SoloData
@@ -40,7 +40,7 @@ func SoloController(c *fiber.Ctx) error {
 		})
 	}
 
-	// Post the soloData to the Google Apps Script endpoint
+	
 	err := postToGoogleAppsScript(soloData)
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
@@ -49,7 +49,7 @@ func SoloController(c *fiber.Ctx) error {
 		})
 	}
 
-	// Post the soloData to the Discord webhook
+	
 	err = postToDiscordWebhook(soloData)
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
@@ -68,7 +68,7 @@ func postToGoogleAppsScript(data SoloData) error {
 	url := "https-://script.google.com/macros/s/AKfycbzVYt0n-KBCrL9kN_d9LQNcu4kkgiCMsd4vPjSJLHVNZ9zDaWGISmb30-zh0sgWlS_FCw/exec"
 	method := "POST"
 
-	// Convert SoloData to JSON
+
 	payloadJSON, err := json.Marshal(data)
 	if err != nil {
 		return err
@@ -94,7 +94,7 @@ func postToGoogleAppsScript(data SoloData) error {
 }
 
 func postToDiscordWebhook(data SoloData) error {
-	url := "https://discord.com/api/webhooks/your_discord_webhook_url"  // Replace with your actual Discord webhook URL
+	url := "https://discord.com/api/webhooks/your_discord_webhook_url" 
 	method := "POST"
 
 	payload := strings.NewReader(`{"content": "Solo registration\nName: ` + data.Name + `\nEmail: ` + data.SRMISTEmail + `"}`)

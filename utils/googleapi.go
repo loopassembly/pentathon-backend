@@ -44,7 +44,7 @@ func initialize() error {
 	return nil
 }
 
-// GetSheetsService returns the initialized sheets service
+
 func GetSheetsService() (*sheets.Service, error) {
 	var err error
 	once.Do(func() {

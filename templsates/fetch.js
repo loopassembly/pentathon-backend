@@ -18,10 +18,10 @@ if (isTeam) {
           getValue('#ally1Section'),
           getValue('#ally1WhatsappNo'),
           getValue('#ally1FAName'),
-          // Add similar lines for ally2 and ally3
+         
           // ...
           getValue('#transactionNumber'),
-          getValue('#paymentScreenshot') // Replace this with the actual file data
+          getValue('#paymentScreenshot') 
         ];
 
         // Construct the request body

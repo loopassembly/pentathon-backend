@@ -10,13 +10,13 @@ import (
 )
 
 func init() {
-	// Load configuration
+	
 	_, err := initializers.LoadConfig(".")
 	if err != nil {
 		log.Fatalln("Failed to load environment variables:", err.Error())
 	}
 
-	// Initialize Google Sheets service
+	
 	_, err = utils.GetSheetsService()
 	if err != nil {
 		log.Fatalf("Error initializing Google Sheets service: %v", err)
