@@ -14,6 +14,12 @@ type Config struct {
 	ScriptURL    string        `mapstructure:"URL"`
 	Datetime     time.Duration `mapstructure:"JWT_EXPIRED_IN"`
 	ClientOrigin string        `mapstructure:"CLIENT_ORIGIN"`
+	SpreadsheetID string		`mapstructure:"SPREADSHEET_ID"`
+	Testsheet string			`mapstructure:"TEST_SHEET"`
+	credentials string			`mapstructure:"CREDENTIALS"`
+	Solosheet string			`mapstructure:"SOLO_SHEET"`
+	Duosheet string				`mapstructure:"DUO_SHEET"`
+	Teamsheet string			`mapstructure:"TEAM_SHEET"`
 }
 
 func LoadConfig(path string) (config Config, err error) {

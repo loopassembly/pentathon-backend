@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "ngai-pentathon",
+  "private_key_id": "a918ecae024fa73917842518218cee64d8102a4a",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDEL2y11WUByzKf\nU7E2NTGYnxaV1ebClmrmtt7RrQ7dQPpUa1Imb1oBXT81SkFfBEqng8yC501NttzS\nDv55MLtVfjZkqi3fFh/5J2M8ORdPlGvBGG6RKxNK6HCe5hf+LereUdFeooz18qXW\nR0Q9qftlTXXdXJ+LAMTP/AlM4Kut9hZ/oFFQE95qOnomPdxo66NrwJFyyJeDaRXP\nYrA03HO+F2gtHBKrEHkNgCWtB8bEfOyk5pVOsHjVAXur0U5SGt2ZhQ9QDEUczXRq\n1QCaV57jm6inUSea0uLDu4JAGESe5Lv5MpNMTiAGqQh1ntIKC9a7MgqVAKQwrBG8\nmmlSIl1NAgMBAAECggEADmJwzNtO6uUAevSqvXAEiS1+/TEAGLvpLi3x4/tVp+zj\n/e0ZiqZm+cshv5FIfkRFCgfMprt5bE2QXtmJGI81aSUWLWbZ8q2/Xeggq1F/T08x\nYGjfcIbxRPCKk2gJEdLBkhf7Kz5tafom5TF4BDJys6CMmBS6wPknNR3Ee83MYLaV\nyyxnE7eBmga7bQ/+vdhtrm/ZfPE2bAw5AF2a3aMLLGDRWEDW8xq4Nf+DfEt0Flv9\nYNjLqTRow9fkKVZDnaq4js4i5qXPNgI2XBZlvaBLvJ/xKjylF/Pc/DaB7OjjIkCR\nsqTPtAibP4nEl4S5ZZP9yExsXkHajMsajKz5q5xSIQKBgQDvopbsKZu8Ll0tJMcO\niugUCM68vu1UZE/xtr5RgEDPJAnRi9LatAC5Vf5VM4Q3OoSAzCEx7Fo2T6M19pTq\nAPrpPr8ebhmXNAgfCA1mVsdLz1rXhOhy4+FAOCEdGFKU4ioazinKy5IEEI0lx6WP\nLUCfDr7YTjBuUx+Ogh5KCxDT7QKBgQDRlTmK3Na05fsH5GuImtabm2NPjXl01wJj\n0mSq0ptOikHrVWYwfwl/uMzkotvNxjGZchL4OKimvpqejwBu7BxVSYPbBlLZLaVx\nLfGbFqM7LRiy3VkXj7Ie/ee3bgZ+RveNYN5HIfSNbfaxSqpaHT/RQA0IVurOEH+P\n05HF++lC4QKBgGji5GYXzCdwr63LtCjEWdIzDLIGa4CNq4QjtWec2EESCA4kwjSh\nptN4NSr7snot7cMmFb1xMwckkk5TUFif9zLSGPrru923k3ppntvVTcP7zUoZzVhE\nL9pY9v1yIOszlrRG2nn94jpPOEh5+xgQ+YDlBllM19viHCTXBQTplQL9AoGBAMb5\nsaPQfldIcMfRaPZMaqtZHzQL0N/IsZAr0z8KrEAoquTOMzKfqVkFDiGTLLN0Eurn\njnLy98s28nzOr06gA1ZFcVWj70wZNhT51YO0PkyUR/qog0kHN8iMrk1LvAZvQd+L\ns/w8lH0hhTBU/t6HHmt/L+BXBJ2WtETMTH126MKBAoGBANA8pzH9bVJlltceV7Qn\nC8CV6eBq14BWAIFQ8eH46jbUDFF/iaMRYjleRk/Lc138KGhUbuS3jXV8qIO8pd1l\nQEhJsUPJ5Xqo2YX2JPPDiH5YkTHBetAll5j9J76KrQTw/l4kh/8lrPVG7SAGTYWS\nYp4x4Br22bzJxUNIAxqGo72c\n-----END PRIVATE KEY-----\n",
+  "client_email": "golangapi@ngai-pentathon.iam.gserviceaccount.com",
+  "client_id": "114384270439315047583",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/golangapi%40ngai-pentathon.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

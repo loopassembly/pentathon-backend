@@ -1,86 +1,208 @@
 package controllers
 
 import (
-	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/loopassembly/pentathon-backend/utils"
+	"github.com/loopassembly/pentathon-backend/initializers"
+	"log"
+	"google.golang.org/api/sheets/v4"
 )
 
-func GetSheet(c *fiber.Ctx) error {
-
-	// Get the form data from the request
-	hackathonType := c.FormValue("hackathon_type")
-
-	// Create a new HTTP client
-	client := &http.Client{}
-
-	// Prepare the form data
-	formData := map[string]string{
-		"hackathon_type": hackathonType,
-	}
-
-	// Encode the form data
-	values := make([]string, 0, len(formData))
-	for key, value := range formData {
-		values = append(values, fmt.Sprintf("%s=%s", key, value))
-	}
-	formBody := bytes.NewBufferString(strings.Join(values, "&"))
-
-	// Make the POST request to the external API
-	resp, err := client.Post("https://script.google.com/macros/s/AKfycbxbbQi2Ikmgi12doDxqN04zqV4k2uDRQZVqJ6GeYn03Qo5n2wKT-IWs2tSScvOjzRe2Wg/exec", "application/x-www-form-urlencoded", formBody)
-	if err != nil {
-		return c.Status(http.StatusInternalServerError).SendString("Error making request")
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return c.Status(http.StatusInternalServerError).SendString("Error reading response")
-	}
-
-	fmt.Println(string(body))
-
-	// Send a response if necessary
-	return c.SendString("Request completed successfully")
-
+type SoloData struct {
+	Name            string `json:"Name"`
+	WhatsAppNo      string `json:"WhatsApp No"`
+	SRMISTEmail     string `json:"SRMIST Email"`
+	RegistrationNo  string `json:"Registration No"`
+	YearOfStudy     string `json:"Year of Study"`
+	Department      string `json:"Department"`
+	FaName          string `json:"FA Name"`
+	Section         string `json:"Section"`
+	Time            string `json:"time"`
+	SRMISTEmailForm string `json:"SRMIST e-mail"`
 }
 
-func weebhookcall() {
-	url := "https://discord.com/api/webhooks/1196466976034410527/kEVE1A5xSMbMuCuLfX9MiQWAAWyWTPpGdAKPmlO27JFJ4pcfUav4Eu6y484h8rvfJ1zR"
+
+func SoloController(c *fiber.Ctx) error {
+	// Use c.Request().Body() directly, which returns a function that returns []byte
+	bodyFn := c.Request().Body
+
+	var soloData SoloData
+	if err := json.Unmarshal(bodyFn(), &soloData); err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
+			"result": "error",
+			"error":  "Error parsing JSON data",
+		})
+	}
+
+	// Post the soloData to the Google Apps Script endpoint
+	err := postToGoogleAppsScript(soloData)
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
+			"result": "error",
+			"error":  "Error posting to Google Apps Script",
+		})
+	}
+
+	// Post the soloData to the Discord webhook
+	err = postToDiscordWebhook(soloData)
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
+			"result": "error",
+			"error":  "Error posting to Discord webhook",
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"result":  "success",
+		"message": fmt.Sprintf("Solo registration successful for %s", soloData.Name),
+	})
+}
+
+func postToGoogleAppsScript(data SoloData) error {
+	url := "https-://script.google.com/macros/s/AKfycbzVYt0n-KBCrL9kN_d9LQNcu4kkgiCMsd4vPjSJLHVNZ9zDaWGISmb30-zh0sgWlS_FCw/exec"
 	method := "POST"
 
-	payload := strings.NewReader(`{` + "" +
-		`"content": "**someone just posted**\nhttps://docs.google.com/spreadsheets/d/1gIOfb8v4GJu1PnMBjxgefQkelb1hyQycQeQjqwFZUvQ/edit#gid=0\n\n⚠️⚠️  **Don't share this link with anyone**⚠️⚠️\n"` + "" + `}` + "" + ``)
+	// Convert SoloData to JSON
+	payloadJSON, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+
+	payload := strings.NewReader(string(payloadJSON))
 
 	client := &http.Client{}
 	req, err := http.NewRequest(method, url, payload)
-
 	if err != nil {
-		fmt.Println(err)
-		return
+		return err
 	}
 	req.Header.Add("Content-Type", "application/json")
-	req.Header.Add("Cookie", "__cfruid=94ea9ebce1d4e1c45e45a31618b9ff538ed11815-1705578748; __dcfduid=0a2108e4b3bc11eea7caa64caf98001f; __sdcfduid=0a2108e4b3bc11eea7caa64caf98001f8b7f632e9ea6f5abaa3f17f3444264f657ae18718d84d4a75b89fa8fe100c1e7; _cfuvid=rwo3UEvrKuGemXgPwqx_jG3UUg_Dlum9OArnRyO056A-1705578748913-0-604800000")
 
 	res, err := client.Do(req)
 	if err != nil {
-		fmt.Println(err)
-		return
+		return err
 	}
 	defer res.Body.Close()
 
-	body, err := io.ReadAll(res.Body)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	fmt.Println(string(body))
+	_, err = io.ReadAll(res.Body)
+	return err
 }
 
-// func errorhandling(c *fiber.Ctx) error {
-// 	return c.SendString("Hello, World 👋!")
-// }
+func postToDiscordWebhook(data SoloData) error {
+	url := "https://discord.com/api/webhooks/your_discord_webhook_url"  // Replace with your actual Discord webhook URL
+	method := "POST"
+
+	payload := strings.NewReader(`{"content": "Solo registration\nName: ` + data.Name + `\nEmail: ` + data.SRMISTEmail + `"}`)
+
+	client := &http.Client{}
+	req, err := http.NewRequest(method, url, payload)
+	if err != nil {
+		return err
+	}
+	req.Header.Add("Content-Type", "application/json")
+
+	res, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	_, err = io.ReadAll(res.Body)
+	return err
+}
+
+
+func ReadDataHandler(c *fiber.Ctx) error {
+	config, _ := initializers.LoadConfig(".")
+	sheetsService, err := utils.GetSheetsService()
+	if err != nil {
+		log.Println("Error getting Google Sheets service:", err)
+		return c.Status(http.StatusInternalServerError).SendString("Internal Server Error")
+	}
+
+	resp, err := sheetsService.Spreadsheets.Values.Get(config.SpreadsheetID, config.Testsheet).Context(c.Context()).Do()
+	if err != nil {
+		log.Println("Error reading data from Google Sheets:", err)
+		return c.Status(http.StatusInternalServerError).SendString("Internal Server Error")
+	}
+
+	data, _ := json.Marshal(resp.Values)
+	return c.Status(http.StatusOK).JSON(data)
+}
+
+func CreateDataHandler(c *fiber.Ctx) error {
+	config, _ := initializers.LoadConfig(".")
+	sheetsService, err := utils.GetSheetsService()
+	if err != nil {
+		log.Println("Error getting Google Sheets service:", err)
+		return c.Status(http.StatusInternalServerError).SendString("Internal Server Error")
+	}
+
+	var requestData utils.RequestData
+	if err := c.BodyParser(&requestData); err != nil {
+		log.Println("Error parsing request body:", err)
+		return c.Status(http.StatusBadRequest).SendString("Bad Request")
+	}
+
+	values := sheets.ValueRange{Values: requestData.Values}
+	_, err = sheetsService.Spreadsheets.Values.Append(config.SpreadsheetID, config.Testsheet, &values).ValueInputOption("RAW").Do()
+	if err != nil {
+		log.Println("Error creating data in Google Sheets:", err)
+		return c.Status(http.StatusInternalServerError).SendString("Internal Server Error")
+	}
+
+	return c.SendStatus(http.StatusCreated)
+}
+
+func SoloDataHandler(c *fiber.Ctx) error {
+	config, _ := initializers.LoadConfig(".")
+	sheetsService, err := utils.GetSheetsService()
+	if err != nil {
+		log.Println("Error getting Google Sheets service:", err)
+		return c.Status(http.StatusInternalServerError).SendString("Internal Server Error")
+	}
+
+	var requestData utils.RequestData
+	if err := c.BodyParser(&requestData); err != nil {
+		log.Println("Error parsing request body:", err)
+		return c.Status(http.StatusBadRequest).SendString("Bad Request")
+	}
+
+	values := sheets.ValueRange{Values: requestData.Values}
+	_, err = sheetsService.Spreadsheets.Values.Append(config.SpreadsheetID, config.Solosheet, &values).ValueInputOption("RAW").Do()
+	if err != nil {
+		log.Println("Error creating data in Google Sheets:", err)
+		return c.Status(http.StatusInternalServerError).SendString("Internal Server Error")
+	}
+
+	return c.SendStatus(http.StatusCreated)
+}
+
+func TeamDataHandler(c *fiber.Ctx) error {
+	config, _ := initializers.LoadConfig(".")
+	sheetsService, err := utils.GetSheetsService()
+	if err != nil {
+		log.Println("Error getting Google Sheets service:", err)
+		return c.Status(http.StatusInternalServerError).SendString("Internal Server Error")
+	}
+
+	var requestData utils.RequestData
+	if err := c.BodyParser(&requestData); err != nil {
+		log.Println("Error parsing request body:", err)
+		return c.Status(http.StatusBadRequest).SendString("Bad Request")
+	}
+
+	values := sheets.ValueRange{Values: requestData.Values}
+	_, err = sheetsService.Spreadsheets.Values.Append(config.SpreadsheetID, config.Teamsheet, &values).ValueInputOption("RAW").Do()
+	if err != nil {
+		log.Println("Error creating data in Google Sheets:", err)
+		return c.Status(http.StatusInternalServerError).SendString("Internal Server Error")
+	}
+
+	return c.SendStatus(http.StatusCreated)
+}
