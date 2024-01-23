@@ -6,11 +6,13 @@ import (
 	"io"
 	"net/http"
 	"strings"
+	"time"
+
+	"log"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/loopassembly/pentathon-backend/utils"
 	"github.com/loopassembly/pentathon-backend/initializers"
-	"log"
+	"github.com/loopassembly/pentathon-backend/utils"
 	"google.golang.org/api/sheets/v4"
 )
 
@@ -171,6 +173,14 @@ func SoloDataHandler(c *fiber.Ctx) error {
 	if err := c.BodyParser(&requestData); err != nil {
 		log.Println("Error parsing request body:", err)
 		return c.Status(http.StatusBadRequest).SendString("Bad Request")
+	}
+
+	// Get the current timestamp
+	currentTime := time.Now().Format(time.RFC3339)
+
+	// Append the timestamp to each user's data
+	for i := range requestData.Values {
+		requestData.Values[i] = append(requestData.Values[i], currentTime)
 	}
 
 	values := sheets.ValueRange{Values: requestData.Values}
