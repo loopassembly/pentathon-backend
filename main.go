@@ -12,11 +12,11 @@ import (
 
 func init() {
 	
-	_, err := initializers.LoadConfig(".")
+	config, err := initializers.LoadConfig(".")
 	if err != nil {
-		log.Fatalln("Failed to load environment variables:", err.Error())
+		log.Fatalln("Failed to load environment variables! \n", err.Error())
 	}
-
+	initializers.ConnectDB(&config)
 	
 	_, err = utils.GetSheetsService()
 	if err != nil {
