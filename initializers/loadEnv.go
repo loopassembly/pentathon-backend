@@ -20,6 +20,12 @@ type Config struct {
 	Solosheet string			`mapstructure:"SOLO_SHEET"`
 	Duosheet string				`mapstructure:"DUO_SHEET"`
 	Teamsheet string			`mapstructure:"TEAM_SHEET"`
+
+	DBHost         string `mapstructure:"POSTGRES_HOST"`
+	DBUserName     string `mapstructure:"POSTGRES_USER"`
+	DBUserPassword string `mapstructure:"POSTGRES_PASSWORD"`
+	DBName         string `mapstructure:"POSTGRES_DB"`
+	DBPort         string `mapstructure:"POSTGRES_PORT"`
 }
 
 func LoadConfig(path string) (config Config, err error) {

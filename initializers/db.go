@@ -1,13 +1,16 @@
 package initializers
 
 import (
-    "log"
-    "os"
-    "gorm.io/gorm"
-    "gorm.io/driver/sqlite"
-	"github.com/loopassembly/pentathon-backend/models"
-)
+	"fmt"
+	"log"
+	"os"
 
+	"github.com/loopassembly/pentathon-backend/models"
+	"gorm.io/driver/postgres"
+	// "gorm.io/driver/sqlite"
+	"gorm.io/gorm"
+)
+// UNIQUE constraint failed: emails.email
 
 var DB *gorm.DB
 
@@ -17,8 +20,10 @@ func ConnectDB(config *Config) {
     // Set the SQLite3 database path
     // dbPath := config.DBPath
     // DB
+    dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai", config.DBHost, config.DBUserName, config.DBUserPassword, config.DBName, config.DBPort)
 
-    DB, err = gorm.Open(sqlite.Open("test.db"), &gorm.Config{}) //?sqlite
+	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+    // DB, err = gorm.Open(sqlite.Open("test.db"), &gorm.Config{}) //?sqlite
 
 if err != nil {
 	log.Fatal("Failed to connect to the Database! \n", err.Error())

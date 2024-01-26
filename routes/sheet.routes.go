@@ -21,6 +21,8 @@ func SetupRoutes(app *fiber.App) {
 	app.Post("/solohandler", controllers.SoloDataHandler)
 
 	app.Post("/teamhandler", controllers.TeamDataHandler)
+
+	app.Post("/image", controllers.ImageUpload)
 }
 
 

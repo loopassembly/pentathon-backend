@@ -1,9 +1,12 @@
 package controllers
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
+	"mime/multipart"
 	"net/http"
 	"strings"
 	"time"
@@ -200,8 +203,9 @@ func SoloDataHandler(c *fiber.Ctx) error {
 
 	if result.Error != nil {
 		log.Println("Error creating data in the database")
+		log.Println("Error:", result.Error.Error())
 
-		if strings.Contains(result.Error.Error(), "UNIQUE constraint failed") {
+		if strings.Contains(result.Error.Error(), "duplicate key value violates unique constraint") {
 			return c.Status(fiber.StatusConflict).JSON(fiber.Map{"status": "fail", "message": "User with that email already exists"})
 		}
 
@@ -281,8 +285,10 @@ func TeamDataHandler(c *fiber.Ctx) error {
 
 					if result.Error != nil {
 						log.Println("Error creating data in the database")
+						log.Println("helllo")
+						log.Println("Error:", result.Error.Error())
 
-						if strings.Contains(result.Error.Error(), "UNIQUE constraint failed") {
+						if strings.Contains(result.Error.Error(), "duplicate key value violates unique constraint") {
 							return c.Status(fiber.StatusConflict).JSON(fiber.Map{"status": "fail", "message": "User with that email already exists"})
 						}
 
@@ -311,3 +317,92 @@ func TeamDataHandler(c *fiber.Ctx) error {
 	
 }
 
+
+
+// ImageResponse struct to represent the JSON response
+type ImageResponse struct {
+	Status int `json:"status_code"`
+	Image  struct {
+		URL string `json:"url"`
+	} `json:"image"`
+}
+
+// ImageUpload is the Fiber controller for handling image uploads
+func ImageUpload(c *fiber.Ctx) error {
+	// API endpoint and method
+	url := "https://freeimage.host/api/1/upload"
+	method := "POST"
+
+	// Parse the form data to retrieve the uploaded file
+	form, err := c.MultipartForm()
+	if err != nil {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"status": "error", "message": "Failed to parse form data"})
+	}
+
+	// Get the file from the form data
+	fileHeader := form.File["source"][0]
+	file, err := fileHeader.Open()
+	if err != nil {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"status": "error", "message": "Failed to get uploaded file"})
+	}
+	defer file.Close()
+
+	// Create a buffer for the request payload
+	payload := &bytes.Buffer{}
+	writer := multipart.NewWriter(payload)
+
+	// Create a form file with the original file name
+	part, err := writer.CreateFormFile("source", "uploaded-image.jpg")
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"status": "error", "message": "Error creating form file"})
+	}
+
+	// Copy the uploaded file to the form file
+	_, err = io.Copy(part, file)
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"status": "error", "message": "Error copying image data"})
+	}
+
+	// Write additional form fields
+	_ = writer.WriteField("key", "6d207e02198a847aa98d0a2a901485a5")
+
+	// Close the writer
+	err = writer.Close()
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"status": "error", "message": "Error closing the writer"})
+	}
+
+	// Create a new HTTP request
+	client := &http.Client{}
+	req, err := http.NewRequest(method, url, payload)
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"status": "error", "message": "Error creating HTTP request"})
+	}
+
+	// Set request headers
+	req.Header.Add("Cookie", "PHPSESSID=u3njks7balo57a5p5p5i1ivnt8")
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+
+	// Execute the request
+	res, err := client.Do(req)
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"status": "error", "message": "Error executing HTTP request"})
+	}
+	defer res.Body.Close()
+
+	// Read the response body
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"status": "error", "message": "Error reading response body"})
+	}
+
+	// Parse the JSON response
+	var imageResponse ImageResponse
+	err = json.Unmarshal(body, &imageResponse)
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"status": "error", "message": "Error parsing JSON response"})
+	}
+
+	// Send the extracted URL and status as a response
+	return c.Status(imageResponse.Status).JSON(fiber.Map{"status": imageResponse.Status, "url": imageResponse.Image.URL})
+}
