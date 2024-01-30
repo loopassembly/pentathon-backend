@@ -188,7 +188,11 @@ func SoloDataHandler(c *fiber.Ctx) error {
 	userEmail := models.Email{
 		Email: requestData.Values[0][2].(string),
 	}
-
+	if requestData.Values[0][2].(string) == "" {
+		
+		return c.Status(fiber.StatusConflict).JSON(fiber.Map{"status": "fail", "message": "Email is empty"})}
+	
+	
 	if initializers.DB == nil {
 		return c.Status(http.StatusInternalServerError).SendString("Database is not initialized")
 	}
@@ -269,6 +273,8 @@ func TeamDataHandler(c *fiber.Ctx) error {
 			for j := range emailIndices {
 				
 				if len(requestData.Values[i]) > emailIndices[j] {
+					if (requestData.Values[i][emailIndices[j]].(string) == "") {
+						break}
 					userEmail := models.Email{
 						Email: requestData.Values[i][emailIndices[j]].(string),
 					}
