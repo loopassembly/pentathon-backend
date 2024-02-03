@@ -21,6 +21,9 @@ func ConnectDB(config *Config) {
     // dbPath := config.DBPath
     // DB
     // dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Shanghai", config.DBHost, config.DBUserName, config.DBUserPassword, config.DBName, config.DBPort)
+	// dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Kolkata", config.DBHost, config.DBUserName, config.DBUserPassword, config.DBName, config.DBPort)
+	// dsn := fmt.Sprintf("host=postgres port=6500 user=admin password=password123 dbname=golang_fiber sslmode=disable TimeZone=Asia/Kolkata")
+
 
 	// DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
     DB, err = gorm.Open(sqlite.Open("test.db"), &gorm.Config{}) //?sqlite

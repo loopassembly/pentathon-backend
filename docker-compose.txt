@@ -16,5 +16,15 @@ services:
       - ./.env
     ports:
       - "5050:80"
+  mygoapp:
+    build:
+      context: .
+    container_name: mygoapp
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    env_file:
+      - ./.env
 volumes:
   progresDB:
